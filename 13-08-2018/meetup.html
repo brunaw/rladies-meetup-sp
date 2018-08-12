@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Tutorial: R básico + dplyr</title>
+    <meta charset="utf-8">
+    <meta name="author" content="1º Meetup R-Ladies São Paulo" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies.css" rel="stylesheet" />
+    <link href="libs/remark-css/rladies-fonts.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/5235085b15.js"></script>
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Tutorial: R básico + <em>dplyr</em>
+### 1º Meetup R-Ladies São Paulo
+### Agosto, 2018
+
+---
+
+
+
+
+
+class: inverse, center, middle
+
+# Olá!
+
+
+Alissa Munerato &lt;br&gt;
+&lt;a href="mailto:alissamunerato@protonmail.com"&gt;&lt;i class="fa fa-envelope fa-fw"&gt;&lt;/i&gt;&amp;nbsp; alissamunerato@protonmail.com&lt;/a&gt;&lt;br&gt;
+
+Bruna Wundervald &lt;br&gt;
+&lt;a href="mailto:brunadaviesw@gmail.com"&gt;&lt;i class="fa fa-envelope fa-fw"&gt;&lt;/i&gt;&amp;nbsp; brunadaviesw@gmail.com&lt;/a&gt;&lt;br&gt;
+&lt;a href="https://brunaw.com/"&gt;&lt;i class="fa fa-link fa-fw"&gt;&lt;/i&gt;&amp;nbsp; brunaw.com&lt;/a&gt;&lt;br&gt;
+&lt;a href="http://github.com/brunaw"&gt;&lt;i class="fa fa-github fa-fw"&gt;&lt;/i&gt;&amp;nbsp; @brunaw&lt;/a&gt;&lt;br&gt;
+
+
+&lt;i class="fa fa-map-marker fa-fw"&gt;&lt;/i&gt;&amp;nbsp; São Paulo, SP, Brasil&lt;/a&gt;
+
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+
+
+
+---
+
+
+class: left
+
+# Relembrando
+
+
+Classes de objetos:
+
+  * `character`: texto
+  * `numeric`: números racionais
+  * `integer`: inteiros 
+  * `logical`: verdadeiro ou falso
+  * `factor`: categóricos
+  * `...`
+  
+Tipos de objetos:  
+  
+  * `vector`: unidimensional, apenas uma classe
+  * `matriz`: bidimensional, apenas uma classe  
+  * `data.frame`: lista de vetores
+  * `list`: pode contar diferentes classes
+
+ 
+---
+
+class: left
+
+# O *tidyverse*
+
+
+&gt;  Coleção de pacotes para ciência de dados, que compartilham
+a mesma filosofia, gramática e estruturas de dados. 
+
+&lt;img src="img/tidy_workflow.png" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: left
+
+# Pacotes
+
+
+```r
+library(tidyverse) 
+tidyverse::tidyverse_packages()
+```
+
+
+  * `ggplot2`: gráficos bonitos
+  * `dplyr`: manipulação de dados
+  * `tidyr`: leitura de dados
+  * `readr`: *tidy*zar os dados
+  * `purrr`: programação funcional
+  * `tibble`: *data.frames* simples
+  * `magrittr`: semântica
+  * `stringr`: lidar com *strings* (texto)
+  * `forcats`: lidar com fatores (classes)
+  * `lubridate`: lidar com datas (classes)
+
+
+---
+
+class: left
+
+# Pacotes
+
+
+```r
+library(tidyverse) 
+tidyverse::tidyverse_packages()
+```
+
+
+  * `ggplot2`: gráficos bonitos
+  * **`dplyr`: manipulação de dados**
+  * `tidyr`: leitura de dados
+  * `readr`: *tidy*zar os dados
+  * `purrr`: programação funcional
+  * `tibble`: *data.frames* simples
+  * **`magrittr`: semântica**
+  * `stringr`: lidar com *strings* (texto)
+  * `forcats`: lidar com fatores (classes)
+  * `lubridate`: lidar com datas (classes)
+
+
+---
+
+class: left
+
+# Livro
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="img/ds.png" alt="Livro: R for Data Science, Hadley Wickham &amp;amp; Garrett Grolemund" width="35%" /&gt;
+&lt;p class="caption"&gt;Livro: R for Data Science, Hadley Wickham &amp; Garrett Grolemund&lt;/p&gt;
+&lt;/div&gt;
+
+
+---
+
+# O `magrittr` e o `pipe` 
+
+  * O `pipe`, ou `%&gt;%`, é um operador que aplica aos 
+valores a sua esquerda operações que estão a direita.
+
+  * Podem ser encadeadas tantas operações quanto se 
+  queira. 
+  
+  * Variáveis temporárias não são criadas. 
+
+
+
+```r
+library(magrittr)
+
+iris %&gt;% 
+  summary()
+```
+
+```
+##   Sepal.Length    Sepal.Width     Petal.Length    Petal.Width   
+##  Min.   :4.300   Min.   :2.000   Min.   :1.000   Min.   :0.100  
+##  1st Qu.:5.100   1st Qu.:2.800   1st Qu.:1.600   1st Qu.:0.300  
+##  Median :5.800   Median :3.000   Median :4.350   Median :1.300  
+##  Mean   :5.843   Mean   :3.057   Mean   :3.758   Mean   :1.199  
+##  3rd Qu.:6.400   3rd Qu.:3.300   3rd Qu.:5.100   3rd Qu.:1.800  
+##  Max.   :7.900   Max.   :4.400   Max.   :6.900   Max.   :2.500  
+##        Species  
+##  setosa    :50  
+##  versicolor:50  
+##  virginica :50  
+##                 
+##                 
+## 
+```
+
+
+
+```r
+iris %&gt;%
+  subset(Sepal.Length &gt; mean(Sepal.Length)) %&gt;% 
+  summary()
+```
+
+---
+
+# Pipe!
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="img/pipe.png" alt="Isto não é um cachimbo!" width="25%" /&gt;
+&lt;p class="caption"&gt;Isto não é um cachimbo!&lt;/p&gt;
+&lt;/div&gt;
+
+
+
+## Atalho no teclado: `ctrl+shift+m`
+
+
+---
+background-image: url("https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy-downsized.gif")
+background-position: 50% 90%
+
+# O `dplyr`
+
+  &gt;  Gramática de manipulação de dados, construída
+  através de "verbos".
+
+5 funções principais: 
+  * `mutate()`: adicionar novas variáveis, que podem ser
+  funções de outras. 
+  * `select()`: seleciona ou descarta variáveis.
+  * `filter()`: filtros por critérios. 
+  * `summarise()`: resumir os dados. 
+  * `arrange()`: ordenar os dados. 
+
+Todas estas operações podem ser combinadas!
+
+  * `group_by()`: performar operações dentro de grupos.
+
+---
+
+
+# Exemplos
+
+Base de dados dos personagens do starwars:
+
+
+```r
+library(dplyr)
+
+starwars %&gt;% 
+  glimpse()
+```
+
+```
+## Observations: 87
+## Variables: 13
+## $ name       &lt;chr&gt; "Luke Skywalker", "C-3PO", "R2-D2", "Darth Vader", ...
+## $ height     &lt;int&gt; 172, 167, 96, 202, 150, 178, 165, 97, 183, 182, 188...
+## $ mass       &lt;dbl&gt; 77.0, 75.0, 32.0, 136.0, 49.0, 120.0, 75.0, 32.0, 8...
+## $ hair_color &lt;chr&gt; "blond", NA, NA, "none", "brown", "brown, grey", "b...
+## $ skin_color &lt;chr&gt; "fair", "gold", "white, blue", "white", "light", "l...
+## $ eye_color  &lt;chr&gt; "blue", "yellow", "red", "yellow", "brown", "blue",...
+## $ birth_year &lt;dbl&gt; 19.0, 112.0, 33.0, 41.9, 19.0, 52.0, 47.0, NA, 24.0...
+## $ gender     &lt;chr&gt; "male", NA, NA, "male", "female", "male", "female",...
+## $ homeworld  &lt;chr&gt; "Tatooine", "Tatooine", "Naboo", "Tatooine", "Alder...
+## $ species    &lt;chr&gt; "Human", "Droid", "Droid", "Human", "Human", "Human...
+## $ films      &lt;list&gt; [&lt;"Revenge of the Sith", "Return of the Jedi", "Th...
+## $ vehicles   &lt;list&gt; [&lt;"Snowspeeder", "Imperial Speeder Bike"&gt;, &lt;&gt;, &lt;&gt;,...
+## $ starships  &lt;list&gt; [&lt;"X-wing", "Imperial shuttle"&gt;, &lt;&gt;, &lt;&gt;, "TIE Adva...
+```
+
+---
+
+# *base* e *dplyr* 
+
+- Problema: selecionar apenas algumas colunas de uma base de dados
+
+- *base*: selecionar por posição ou nome
+
+```r
+names(starwars)
+```
+
+```
+##  [1] "name"       "height"     "mass"       "hair_color" "skin_color"
+##  [6] "eye_color"  "birth_year" "gender"     "homeworld"  "species"   
+## [11] "films"      "vehicles"   "starships"
+```
+
+```r
+dados &lt;- starwars[ , c(1, 2, 3)] # Seleciona as colunas de posição 1, 2 e 3
+
+# ou
+
+dados &lt;- starwars[ , c("name", "height", "mass")] # Seleciona as colunas nomeadas "name", "height" e "mass"
+```
+
+- *dplyr*: selecionar com `select`
+
+
+```r
+dados &lt;- starwars %&gt;% 
+  select(1, 2, 3)
+
+dados &lt;- starwars %&gt;% 
+  select(name, height, mass)
+```
+
+
+---
+
+# *base* e *dplyr* 
+
+- Problema: remover os `NA`, selecionar apenas os personagens 
+que tem olho de cor amarela, calcular o IMC deles e manter apenas as 
+colunas de interesse.
+
+- *base* 
+
+
+```r
+dados &lt;- starwars[!is.na(starwars$gender),] # Remove NAs
+
+dados &lt;- dados[dados$eye_color == "black", ] # Faz o filtro
+
+dados$imc &lt;- dados$mass/((dados$height/100)^2) # Cria a variável de IMC
+
+dados &lt;- dados[ , c("name", "gender", "imc")] # Seleciona as colunas
+
+dados &lt;- na.omit(dados)
+
+head(dados, 3)
+```
+
+```
+## # A tibble: 3 x 3
+##   name      gender   imc
+##   &lt;chr&gt;     &lt;chr&gt;  &lt;dbl&gt;
+## 1 Greedo    male    24.7
+## 2 Nien Nunb male    26.6
+## 3 Kit Fisto male    22.6
+```
+
+
+---
+
+# *base* e *dplyr* 
+
+- Problema: remover os `NA`, selecionar apenas os personagens 
+que tem olho de cor amarela, calcular o imc deles e manter apenas as 
+colunas de interesse.
+
+- *dplyr* 
+
+```r
+dados &lt;- starwars %&gt;% 
+  filter(!is.na(gender), eye_color == "black") %&gt;% 
+  mutate(imc = mass/((height/100)^2)) %&gt;% 
+  select(name, gender, imc) %&gt;% 
+  na.omit()
+
+dados %&gt;% slice(1:3)
+```
+
+```
+## # A tibble: 3 x 3
+##   name      gender   imc
+##   &lt;chr&gt;     &lt;chr&gt;  &lt;dbl&gt;
+## 1 Greedo    male    24.7
+## 2 Nien Nunb male    26.6
+## 3 Kit Fisto male    22.6
+```
+
+
+---
+
+# *base* e *dplyr* 
+
+Operações por grupo, por exemplo o cálculo do peso médio para cada gênero, 
+apenas de quem tem olho da cor preta.
+- *base*
+
+```r
+dados &lt;- starwars[!is.na(starwars$gender), ]
+dados &lt;- dados[dados$eye_color == "black", ]
+dados &lt;- dados[!is.na(dados$mass),]
+
+
+medias &lt;- lapply(split(dados, as.factor(dados$gender)), 
+                 function(x) c(Mean = mean(x$mass)))
+
+medias
+```
+
+```
+## $female
+## Mean 
+##   57 
+## 
+## $male
+## Mean 
+## 79.5
+```
+
+---
+
+# *base* e *dplyr* 
+
+Operações por grupo, por exemplo o cálculo do peso médio para cada gênero, 
+apenas de quem tem olho da cor preta.
+- *dplyr* 
+
+```r
+medias &lt;- starwars %&gt;%
+  filter(!is.na(gender), eye_color == "black", !is.na(mass)) %&gt;% 
+  group_by(gender) %&gt;% 
+  summarise(media = mean(mass))
+medias
+```
+
+```
+## # A tibble: 2 x 2
+##   gender media
+##   &lt;chr&gt;  &lt;dbl&gt;
+## 1 female  57  
+## 2 male    79.5
+```
+
+
+---
+
+# Vantagens até agora
+
+- Menos texto escrito (não repetimos o nome da base, não usamos `c()`,...)
+- Operações encadeadas em um mesmo `pipe` de forma sequencial 
+- Código muito mais claro
+- Resultados em `data.frame` ou `tibble`
+
+---
+
+
+# Exemplos
+
+
+```r
+starwars %&gt;% 
+  na.omit() %&gt;% 
+  dplyr::filter(height &lt; 200) %&gt;% 
+  dplyr::mutate(imc = mass/((height/100)^2)) %&gt;% 
+  dplyr::group_by(species) %&gt;%
+  dplyr::summarise(qtde = n_distinct(name), 
+                   media_imc = mean(imc)) %&gt;% 
+  dplyr::select(species, qtde, media_imc) %&gt;% 
+  dplyr::arrange(media_imc)
+```
+
+```
+## # A tibble: 10 x 3
+##    species       qtde media_imc
+##    &lt;chr&gt;        &lt;int&gt;     &lt;dbl&gt;
+##  1 Gungan           1      17.2
+##  2 Twi'lek          1      17.4
+##  3 Mirialan         2      18.8
+##  4 Cerean           1      20.9
+##  5 Kel Dor          1      22.6
+##  6 Human           17      24.8
+##  7 Mon Calamari     1      25.6
+##  8 Ewok             1      25.8
+##  9 Zabrak           1      26.1
+## 10 Trandoshan       1      31.3
+```
+
+
+---
+
+# Exemplos
+
+  * E porque usar os `::`?
+    * Os `::` acesssam funções diretamente do pacote. 
+    * O `dplyr`, na verdade, é a nova versão do `plyr`, 
+  focada em data.frames. 
+    * Eles têm funções com o mesmo nome.
+
+
+```r
+plyr::summarise()
+dplyr::summarise()
+```
+
+  * Como posso ver o que está em conflito no meu ambiente?
+
+```r
+conflicts() %&gt;% head(10)
+```
+
+```
+## [1] "%&gt;%"       "filter"    "lag"       "body&lt;-"    "intersect" "kronecker"
+## [7] "setdiff"   "setequal"  "union"
+```
+  
+---
+
+
+# Usando `ggplot` direto nos dados 
+
+
+```r
+library(ggplot2)
+clientes &lt;- read.table("dados.txt")
+
+clientes %&gt;% 
+  ggplot(aes(valor_gasto)) +
+  geom_density(fill = "skyblue3", alpha = 0.5) + 
+  geom_vline(xintercept = mean(clientes$valor_gasto), linetype = 2, size = 1.1) +
+  theme_bw() 
+```
+
+&lt;img src="meetup_files/figure-html/unnamed-chunk-19-1.png" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+# Usando estes dados
+
+
+```r
+clientes %&gt;% 
+  group_by(classe, sexo) %&gt;% 
+  summarise(media_gasto = sum(quantidade * valor_gasto)/n_distinct(id)) 
+```
+
+```
+## # A tibble: 4 x 3
+## # Groups:   classe [?]
+##   classe sexo  media_gasto
+##   &lt;fct&gt;  &lt;fct&gt;       &lt;dbl&gt;
+## 1 A      F           11.4 
+## 2 A      M           10.1 
+## 3 B      F            2.94
+## 4 B      M            4.27
+```
+
+
+---
+
+class: center, middle
+
+## *joins* - uniões de bases através de chaves. 
+  
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+
+
+
+---
+
+&lt;img src="img/joins.png" width="60%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Exemplo
+
+
+```r
+df &lt;- starwars %&gt;%                  # Uma base apenas com nomes e alturas
+  filter(height &lt; 165) %&gt;% 
+  select(name, height)
+
+df %&gt;% slice(1:3)
+```
+
+```
+## # A tibble: 3 x 2
+##   name        height
+##   &lt;chr&gt;        &lt;int&gt;
+## 1 R2-D2           96
+## 2 Leia Organa    150
+## 3 R5-D4           97
+```
+
+
+```r
+da &lt;- starwars %&gt;%               # Uma base apenas com nomes e pesos
+  filter(mass &lt; 100) %&gt;% 
+  select(name, mass)
+
+da %&gt;% slice(1:3)
+```
+
+```
+## # A tibble: 3 x 2
+##   name            mass
+##   &lt;chr&gt;          &lt;dbl&gt;
+## 1 Luke Skywalker    77
+## 2 C-3PO             75
+## 3 R2-D2             32
+```
+
+---
+
+# A base à esquerda combinada com a da direita
+
+
+```r
+dplyr::left_join(df, da, by = "name")
+```
+
+```
+## # A tibble: 16 x 3
+##    name                  height  mass
+##    &lt;chr&gt;                  &lt;int&gt; &lt;dbl&gt;
+##  1 R2-D2                     96    32
+##  2 Leia Organa              150    49
+##  3 R5-D4                     97    32
+##  4 Yoda                      66    17
+##  5 Mon Mothma               150    NA
+##  6 Wicket Systri Warrick     88    20
+##  7 Nien Nunb                160    68
+##  8 Watto                    137    NA
+##  9 Sebulba                  112    40
+## 10 Shmi Skywalker           163    NA
+## 11 Dud Bolt                  94    45
+## 12 Gasgano                  122    NA
+## 13 Ben Quadinaros           163    65
+## 14 Cordé                    157    NA
+## 15 Ratts Tyerell             79    15
+## 16 R4-P17                    96    NA
+```
+
+---
+
+# O que é comum entre as duas bases
+
+
+
+```r
+dplyr::inner_join(df, da, by = "name")
+```
+
+```
+## # A tibble: 10 x 3
+##    name                  height  mass
+##    &lt;chr&gt;                  &lt;int&gt; &lt;dbl&gt;
+##  1 R2-D2                     96    32
+##  2 Leia Organa              150    49
+##  3 R5-D4                     97    32
+##  4 Yoda                      66    17
+##  5 Wicket Systri Warrick     88    20
+##  6 Nien Nunb                160    68
+##  7 Sebulba                  112    40
+##  8 Dud Bolt                  94    45
+##  9 Ben Quadinaros           163    65
+## 10 Ratts Tyerell             79    15
+```
+
+---
+
+# União completa das duas bases
+
+
+
+```r
+dplyr::full_join(df, da, by = "name")
+```
+
+```
+## # A tibble: 55 x 3
+##    name                  height  mass
+##    &lt;chr&gt;                  &lt;int&gt; &lt;dbl&gt;
+##  1 R2-D2                     96    32
+##  2 Leia Organa              150    49
+##  3 R5-D4                     97    32
+##  4 Yoda                      66    17
+##  5 Mon Mothma               150    NA
+##  6 Wicket Systri Warrick     88    20
+##  7 Nien Nunb                160    68
+##  8 Watto                    137    NA
+##  9 Sebulba                  112    40
+## 10 Shmi Skywalker           163    NA
+## # ... with 45 more rows
+```
+
+---
+
+class: center, middle
+
+&lt;img src="img/dplyr.png" width="35%" style="display: block; margin: auto;" /&gt;
+
+---
+
+class: bottom, center, inverse
+
+background-image: url("https://media.giphy.com/media/l3q2u6MXJJEKiTZIY/giphy.gif")
+background-position: 50% 40%
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

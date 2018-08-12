@@ -1,0 +1,483 @@
+---
+title: "Tutorial: R básico + *dplyr*"
+#subtitle: "O pacote *tidyverse*"
+author: "1º  Meetup R-Ladies São Paulo"
+date: "Agosto, 2018"
+output:
+  xaringan::moon_reader:
+    css: ["default", "rladies", "rladies-fonts"]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    includes:
+      in_header: header.html
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+
+class: inverse, center, middle
+
+# Olá!
+
+
+Alissa Munerato <br>
+<a href="mailto:alissamunerato@protonmail.com"><i class="fa fa-envelope fa-fw"></i>&nbsp; alissamunerato@protonmail.com</a><br>
+
+Bruna Wundervald <br>
+<a href="mailto:brunadaviesw@gmail.com"><i class="fa fa-envelope fa-fw"></i>&nbsp; brunadaviesw@gmail.com</a><br>
+<a href="https://brunaw.com/"><i class="fa fa-link fa-fw"></i>&nbsp; brunaw.com</a><br>
+<a href="http://github.com/brunaw"><i class="fa fa-github fa-fw"></i>&nbsp; @brunaw</a><br>
+
+
+<i class="fa fa-map-marker fa-fw"></i>&nbsp; São Paulo, SP, Brasil</a>
+
+<p>&nbsp;</p>
+
+```{r, echo = FALSE, out.width="75%", eval=FALSE}
+knitr::include_graphics(c("img/logos.png"))
+```
+
+---
+
+
+class: left
+
+# Relembrando
+
+
+Classes de objetos:
+
+  * `character`: texto
+  * `numeric`: números racionais
+  * `integer`: inteiros 
+  * `logical`: verdadeiro ou falso
+  * `factor`: categóricos
+  * `...`
+  
+Tipos de objetos:  
+  
+  * `vector`: unidimensional, apenas uma classe
+  * `matriz`: bidimensional, apenas uma classe  
+  * `data.frame`: lista de vetores
+  * `list`: pode contar diferentes classes
+
+ 
+---
+
+class: left
+
+# O *tidyverse*
+
+
+>  Coleção de pacotes para ciência de dados, que compartilham
+a mesma filosofia, gramática e estruturas de dados. 
+
+```{r, echo = FALSE, out.width="75%", fig.align='center'}
+knitr::include_graphics("img/tidy_workflow.png")
+```
+
+---
+
+class: left
+
+# Pacotes
+
+```{r, eval = FALSE}
+library(tidyverse) 
+tidyverse::tidyverse_packages()
+```
+
+
+  * `ggplot2`: gráficos bonitos
+  * `dplyr`: manipulação de dados
+  * `tidyr`: leitura de dados
+  * `readr`: *tidy*zar os dados
+  * `purrr`: programação funcional
+  * `tibble`: *data.frames* simples
+  * `magrittr`: semântica
+  * `stringr`: lidar com *strings* (texto)
+  * `forcats`: lidar com fatores (classes)
+  * `lubridate`: lidar com datas (classes)
+
+
+---
+
+class: left
+
+# Pacotes
+
+```{r, eval = FALSE}
+library(tidyverse) 
+tidyverse::tidyverse_packages()
+```
+
+
+  * `ggplot2`: gráficos bonitos
+  * **`dplyr`: manipulação de dados**
+  * `tidyr`: leitura de dados
+  * `readr`: *tidy*zar os dados
+  * `purrr`: programação funcional
+  * `tibble`: *data.frames* simples
+  * **`magrittr`: semântica**
+  * `stringr`: lidar com *strings* (texto)
+  * `forcats`: lidar com fatores (classes)
+  * `lubridate`: lidar com datas (classes)
+
+
+---
+
+class: left
+
+# Livro
+
+
+```{r, echo = FALSE, out.width="35%", fig.align='center', fig.cap="Livro: R for Data Science, Hadley Wickham & Garrett Grolemund"}
+knitr::include_graphics("img/ds.png")
+```
+
+
+---
+
+# O `magrittr` e o `pipe` 
+
+  * O `pipe`, ou `%>%`, é um operador que aplica aos 
+valores a sua esquerda operações que estão a direita.
+
+  * Podem ser encadeadas tantas operações quanto se 
+  queira. 
+  
+  * Variáveis temporárias não são criadas. 
+
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+library(magrittr)
+
+iris %>% 
+  summary()
+```
+
+
+```{r, eval = FALSE}
+iris %>%
+  subset(Sepal.Length > mean(Sepal.Length)) %>% 
+  summary()
+```
+
+---
+
+# Pipe!
+
+
+```{r, echo = FALSE, out.width="25%", fig.align='center', fig.cap="Isto não é um cachimbo!"}
+knitr::include_graphics("img/pipe.png")
+```
+
+
+
+## Atalho no teclado: `ctrl+shift+m`
+
+
+---
+background-image: url("https://media.giphy.com/media/3o7btPCcdNniyf0ArS/giphy-downsized.gif")
+background-position: 50% 90%
+
+# O `dplyr`
+
+  >  Gramática de manipulação de dados, construída
+  através de "verbos".
+
+5 funções principais: 
+  * `mutate()`: adicionar novas variáveis, que podem ser
+  funções de outras. 
+  * `select()`: seleciona ou descarta variáveis.
+  * `filter()`: filtros por critérios. 
+  * `summarise()`: resumir os dados. 
+  * `arrange()`: ordenar os dados. 
+
+Todas estas operações podem ser combinadas!
+
+  * `group_by()`: performar operações dentro de grupos.
+
+---
+
+
+# Exemplos
+
+Base de dados dos personagens do starwars:
+
+```{r, message = FALSE, warning = FALSE}
+library(dplyr)
+
+starwars %>% 
+  glimpse()
+```
+
+---
+
+# *base* e *dplyr* 
+
+- Problema: selecionar apenas algumas colunas de uma base de dados
+
+- *base*: selecionar por posição ou nome
+```{r, message = FALSE, warning = FALSE}
+names(starwars)
+
+dados <- starwars[ , c(1, 2, 3)] # Seleciona as colunas de posição 1, 2 e 3
+
+# ou
+
+dados <- starwars[ , c("name", "height", "mass")] # Seleciona as colunas nomeadas "name", "height" e "mass"
+
+```
+
+- *dplyr*: selecionar com `select`
+
+```{r, message = FALSE, warning = FALSE}
+
+dados <- starwars %>% 
+  select(1, 2, 3)
+
+dados <- starwars %>% 
+  select(name, height, mass)
+```
+
+
+---
+
+# *base* e *dplyr* 
+
+- Problema: remover os `NA`, selecionar apenas os personagens 
+que tem olho de cor amarela, calcular o IMC deles e manter apenas as 
+colunas de interesse.
+
+- *base* 
+
+```{r, message = FALSE, warning = FALSE}
+dados <- starwars[!is.na(starwars$gender),] # Remove NAs
+
+dados <- dados[dados$eye_color == "black", ] # Faz o filtro
+
+dados$imc <- dados$mass/((dados$height/100)^2) # Cria a variável de IMC
+
+dados <- dados[ , c("name", "gender", "imc")] # Seleciona as colunas
+
+dados <- na.omit(dados)
+
+head(dados, 3)
+```
+
+
+---
+
+# *base* e *dplyr* 
+
+- Problema: remover os `NA`, selecionar apenas os personagens 
+que tem olho de cor amarela, calcular o imc deles e manter apenas as 
+colunas de interesse.
+
+- *dplyr* 
+```{r, message = FALSE, warning = FALSE}
+dados <- starwars %>% 
+  filter(!is.na(gender), eye_color == "black") %>% 
+  mutate(imc = mass/((height/100)^2)) %>% 
+  select(name, gender, imc) %>% 
+  na.omit()
+
+dados %>% slice(1:3)
+```
+
+
+---
+
+# *base* e *dplyr* 
+
+Operações por grupo, por exemplo o cálculo do peso médio para cada gênero, 
+apenas de quem tem olho da cor preta.
+- *base*
+```{r}
+dados <- starwars[!is.na(starwars$gender), ]
+dados <- dados[dados$eye_color == "black", ]
+dados <- dados[!is.na(dados$mass),]
+
+
+medias <- lapply(split(dados, as.factor(dados$gender)), 
+                 function(x) c(Mean = mean(x$mass)))
+
+medias
+```
+
+---
+
+# *base* e *dplyr* 
+
+Operações por grupo, por exemplo o cálculo do peso médio para cada gênero, 
+apenas de quem tem olho da cor preta.
+- *dplyr* 
+```{r}
+medias <- starwars %>%
+  filter(!is.na(gender), eye_color == "black", !is.na(mass)) %>% 
+  group_by(gender) %>% 
+  summarise(media = mean(mass))
+medias
+```
+
+
+---
+
+# Vantagens até agora
+
+- Menos texto escrito (não repetimos o nome da base, não usamos `c()`,...)
+- Operações encadeadas em um mesmo `pipe` de forma sequencial 
+- Código muito mais claro
+- Resultados em `data.frame` ou `tibble`
+
+---
+
+
+# Exemplos
+
+```{r, message = FALSE, warning = FALSE}
+starwars %>% 
+  na.omit() %>% 
+  dplyr::filter(height < 200) %>% 
+  dplyr::mutate(imc = mass/((height/100)^2)) %>% 
+  dplyr::group_by(species) %>%
+  dplyr::summarise(qtde = n_distinct(name), 
+                   media_imc = mean(imc)) %>% 
+  dplyr::select(species, qtde, media_imc) %>% 
+  dplyr::arrange(media_imc)
+```
+
+
+---
+
+# Exemplos
+
+  * E porque usar os `::`?
+    * Os `::` acesssam funções diretamente do pacote. 
+    * O `dplyr`, na verdade, é a nova versão do `plyr`, 
+  focada em data.frames. 
+    * Eles têm funções com o mesmo nome.
+
+```{r, eval = FALSE}
+plyr::summarise()
+dplyr::summarise()
+```
+
+  * Como posso ver o que está em conflito no meu ambiente?
+```{r}
+conflicts() %>% head(10)
+```
+  
+---
+
+
+# Usando `ggplot` direto nos dados 
+
+```{r, fig.height=4, fig.width=6, fig.align='center'}
+library(ggplot2)
+clientes <- read.table("dados.txt")
+
+clientes %>% 
+  ggplot(aes(valor_gasto)) +
+  geom_density(fill = "skyblue3", alpha = 0.5) + 
+  geom_vline(xintercept = mean(clientes$valor_gasto), linetype = 2, size = 1.1) +
+  theme_bw() 
+```
+
+
+---
+
+# Usando estes dados
+
+```{r}
+clientes %>% 
+  group_by(classe, sexo) %>% 
+  summarise(media_gasto = sum(quantidade * valor_gasto)/n_distinct(id)) 
+```
+
+
+---
+
+class: center, middle
+
+## *joins* - uniões de bases através de chaves. 
+  
+<p>&nbsp;</p>
+
+
+
+---
+
+```{r, echo = FALSE, out.width="60%", fig.align='center'}
+knitr::include_graphics("img/joins.png")
+```
+
+---
+
+# Exemplo
+
+```{r}
+df <- starwars %>%                  # Uma base apenas com nomes e alturas
+  filter(height < 165) %>% 
+  select(name, height)
+
+df %>% slice(1:3)
+```
+
+```{r}
+da <- starwars %>%               # Uma base apenas com nomes e pesos
+  filter(mass < 100) %>% 
+  select(name, mass)
+
+da %>% slice(1:3)
+```
+
+---
+
+# A base à esquerda combinada com a da direita
+
+```{r}
+dplyr::left_join(df, da, by = "name")
+```
+
+---
+
+# O que é comum entre as duas bases
+
+
+```{r}
+dplyr::inner_join(df, da, by = "name")
+```
+
+---
+
+# União completa das duas bases
+
+
+```{r}
+dplyr::full_join(df, da, by = "name")
+```
+
+---
+
+class: center, middle
+
+```{r, echo = FALSE, out.width="35%", fig.align='center'}
+knitr::include_graphics("img/dplyr.png")
+```
+
+---
+
+class: bottom, center, inverse
+
+background-image: url("https://media.giphy.com/media/l3q2u6MXJJEKiTZIY/giphy.gif")
+background-position: 50% 40%
+
