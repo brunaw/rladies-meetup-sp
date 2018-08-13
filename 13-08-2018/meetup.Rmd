@@ -253,9 +253,9 @@ dados <- starwars %>%
 
 # *base* e *dplyr* 
 
-- Problema: remover os `NA`, selecionar apenas os personagens 
-que tem olho de cor amarela, calcular o IMC deles e manter apenas as 
-colunas de interesse.
+- Problema: remover os `NA` da coluna de gêneros, 
+selecionar apenas os personagens que tem olho de cor preta, 
+calcular o IMC deles e manter apenas as colunas de interesse.
 
 - *base* 
 
@@ -378,17 +378,26 @@ conflicts() %>% head(10)
   
 ---
 
+# Exemplo - dados simulados 
+
+```{r}
+library(ggplot2)
+clientes <- read.table("dados.txt")
+
+clientes %>% glimpse()
+
+```
+
+---
 
 # Usando `ggplot` direto nos dados 
 
 ```{r, fig.height=4, fig.width=6, fig.align='center'}
-library(ggplot2)
-clientes <- read.table("dados.txt")
-
 clientes %>% 
   ggplot(aes(valor_gasto)) +
   geom_density(fill = "skyblue3", alpha = 0.5) + 
-  geom_vline(xintercept = mean(clientes$valor_gasto), linetype = 2, size = 1.1) +
+  geom_vline(xintercept = mean(clientes$valor_gasto),
+             linetype = 2, size = 1.1) +
   theme_bw() 
 ```
 
@@ -396,6 +405,8 @@ clientes %>%
 ---
 
 # Usando estes dados
+
+Encontrar a média de gasto por cliente:
 
 ```{r}
 clientes %>% 
